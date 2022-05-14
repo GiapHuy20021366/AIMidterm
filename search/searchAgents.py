@@ -377,12 +377,13 @@ def cornersHeuristic(state, problem):
     pos = state[0]
     unvisitted_corners = list(set(corners) - set(state[1]))
     distance = 0
-    while len(unvisitted_corners) != 0:
-        manhattans = dict({})
+    for _ in range(0, len(unvisitted_corners)):
+        manhattans = util.PriorityQueue()
         for corner in unvisitted_corners:
-            manhattans[corner] = abs(pos[0] - corner[0]) + abs(pos[1] - corner[1])
-        nearest_corner = min(manhattans, key=lambda corner: manhattans[corner])    
-        distance += manhattans[nearest_corner]
+            manhattan_distance = util.manhattanDistance(pos, corner)
+            manhattans.push((corner, manhattan_distance), manhattan_distance)
+        nearest_corner, manhattan_distance = manhattans.pop()
+        distance += manhattan_distance
         pos = nearest_corner
         unvisitted_corners.remove(nearest_corner)
     
