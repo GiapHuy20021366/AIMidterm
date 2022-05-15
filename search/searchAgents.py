@@ -377,7 +377,7 @@ def cornersHeuristic(state, problem):
     pos = state[0]
     unvisitted_corners = list(set(corners) - set(state[1]))
     distance = 0
-    for _ in range(0, len(unvisitted_corners)):
+    while len(unvisitted_corners) > 0:
         manhattans = util.PriorityQueue()
         for corner in unvisitted_corners:
             manhattan_distance = util.manhattanDistance(pos, corner)
@@ -520,6 +520,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
+        # return search.depthFirstSearch(problem)
         return search.aStarSearch(problem)
         
         util.raiseNotDefined()

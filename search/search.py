@@ -96,10 +96,13 @@ def depthFirstSearch(problem):
         if problem.isGoalState(node): return path
         if node not in visited_node: 
             visited_node.append(node)
-            for successor,action, stepCost in problem.getSuccessors(node):
+            for successor, action, stepCost in problem.getSuccessors(node):
+                if successor in visited_node: continue
                 successor_cost = cost + stepCost
                 successor_path = path + [action]
                 stack.push((successor, successor_cost, successor_path))
+                # print(successor_cost)
+                # print(successor_path)
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
@@ -107,17 +110,18 @@ def breadthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     start_node = (problem.getStartState(), 0, [])
     visited_node = []
-    stack = util.Queue()
-    stack.push(start_node)
-    while not stack.isEmpty():
-        node, cost, path = stack.pop()
+    queue = util.Queue()
+    queue.push(start_node)
+    while not queue.isEmpty():
+        node, cost, path = queue.pop()
         if problem.isGoalState(node): return path
         if node not in visited_node: 
             visited_node.append(node)
-            for successor,action, stepCost in problem.getSuccessors(node):
+            for successor, action, stepCost in problem.getSuccessors(node):
+                if successor in visited_node: continue
                 successor_cost = cost + stepCost
                 successor_path = path + [action]
-                stack.push((successor, successor_cost, successor_path))
+                queue.push((successor, successor_cost, successor_path))
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
@@ -129,13 +133,14 @@ def uniformCostSearch(problem):
     priorityQueue = util.PriorityQueue()
     priorityQueue.push((startingNode, [], 0), 0)
 
-    while not  priorityQueue.isEmpty():
+    while not priorityQueue.isEmpty():
         currentNode, actions, oldCost =  priorityQueue.pop()
         if currentNode not in visitedNodes:
             visitedNodes.append(currentNode)
             if problem.isGoalState(currentNode):
                 return actions
             for nextNode, action, cost in problem.getSuccessors(currentNode):
+                if nextNode in visitedNodes: continue
                 nextAction = actions + [action]
                 priority = oldCost + cost
                 priorityQueue.push((nextNode, nextAction, priority), priority)
@@ -161,9 +166,9 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         currentNode, actions, oldCost = priorityQueue.pop()
         if currentNode not in visitedNodes:
             visitedNodes.append(currentNode)
-            if problem.isGoalState(currentNode):
-                return actions
+            if problem.isGoalState(currentNode): return actions
             for nextNode, action, cost in problem.getSuccessors(currentNode):
+                if nextNode in visitedNodes: continue
                 nextAction = actions + [action]
                 newCostToNode = oldCost + cost
                 heuristicCost = newCostToNode + heuristic(nextNode, problem)
