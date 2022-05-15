@@ -1,6 +1,2 @@
-*.pyc
-*.lay
 *.zip
-/search/test_cases
 /minicontest1
-/multiagent/test_cases
