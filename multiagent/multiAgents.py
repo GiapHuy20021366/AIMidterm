@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from json.encoder import INFINITY
 from util import manhattanDistance
 from game import Directions
 import random, util
@@ -27,7 +28,6 @@ class ReflexAgent(Agent):
     it in any way you see fit, so long as you don't touch our method
     headers.
     """
-
 
     def getAction(self, gameState):
         """
@@ -74,11 +74,12 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        # print(newPos)
+        print(newPos)
         # print(newFood.asList())
         # print(newGhostStates[0], '|||',  newGhostStates[1])
         # print(newGhostStates[0].getPosition())
-        # print(newScaredTimes)
+        print(newScaredTimes)
+        
         newFood = newFood.asList() #List position of foods
         ghostPos = [G.getPosition() for G in newGhostStates] #List position of ghosts
         nearest_ghost = min(ghostPos, key = lambda ghost_pos: util.manhattanDistance(ghost_pos, newPos))
@@ -156,7 +157,18 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        pacmanValue = -INFINITY
+        pacmanAction = Directions.STOP
+
+        for action in gameState.getLegalActions(0):
+            nextState = gameState.generateSuccessor(0, action)
+            nextValue = self.getValue(nextState, 0, 1)
+
+            if pacmanValue < nextValue:
+                pacmanValue = nextValue
+                pacmanAction = action
+        
+        return pacmanAction
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
