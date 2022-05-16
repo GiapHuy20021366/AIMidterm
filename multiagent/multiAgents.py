@@ -74,11 +74,12 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        print(newPos)
+        # print(newPos)
+        # print(newScaredTimes)
+
         # print(newFood.asList())
         # print(newGhostStates[0], '|||',  newGhostStates[1])
         # print(newGhostStates[0].getPosition())
-        print(newScaredTimes)
         
         newFood = newFood.asList() #List position of foods
         ghostPos = [G.getPosition() for G in newGhostStates] #List position of ghosts
@@ -96,7 +97,7 @@ class ReflexAgent(Agent):
         
         return 1 / nearest_food_mhtd - 1.5 / nearest_ghost_mhtd 
         
-        return successorGameState.getScore()
+        # return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -127,6 +128,9 @@ class MultiAgentSearchAgent(Agent):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
+    
+    def minimax(self):
+
 
 class MinimaxAgent(MultiAgentSearchAgent):
     """
