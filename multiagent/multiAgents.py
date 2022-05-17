@@ -172,8 +172,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
             # pacman -> tim gia tri max
             if agentIndex == 0:
+                nextAgent = agentIndex + 1
                 return max(
-                    minimax(agentIndex + 1, depth, gameState.generateSuccessor(agentIndex, action)) for action in actions
+                    minimax(nextAgent, depth, gameState.generateSuccessor(agentIndex, action)) for action in actions
                 )
 
             # ghost -> tim gia tri min
@@ -262,7 +263,37 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        def expectimax(agentIndex, depth, gameState):
+            if gameState.isWin() or gameState.isLose() or depth == self.depth:
+                return self.evaluationFunction(gameState)
+
+            actions = gameState.getLegalActions(agentIndex)
+
+            if agentIndex == 0:
+                nextAgent = agentIndex + 1
+                return max(
+                    expectimax(nextAgent, depth, gameState.generateSuccessor(agentIndex, action)) for action in actions
+                )
+
+            if agentIndex != 0:
+                nextAgent = agentIndex + 1
+                if gameState.getNumAgents() == nextAgent: #last agent
+                    nextAgent = 0
+                    depth += 1
+                score = 0.0
+                for action in actions:
+                    score += expectimax(nextAgent, depth, gameState.generateSuccessor(agentIndex, action))
+                score /= len(actions)
+                return score
+
+        maxScore = float("-inf")
+        bestAction = Directions.STOP
+        for action in gameState.getLegalActions(0):
+            score = expectimax(1, 0, gameState.generateSuccessor(0, action))
+            if score > maxScore:
+                maxScore = score
+                bestAction = action
+        return bestAction
 
 def betterEvaluationFunction(currentGameState):
     """
