@@ -379,12 +379,16 @@ def cornersHeuristic(state, problem):
     distance = 0
 
     while len(unvisited_corners) > 0:
-        priDist = util.PriorityQueue()
-        for corner in unvisited_corners:
-            manhattan_dis = util.manhattanDistance(pacmanPos, corner)
-            priDist.push((corner, manhattan_dis), manhattan_dis)
-        nearest_corner, manhattan_dis = priDist.pop()
-        distance += manhattan_dis
+        # priDist = util.PriorityQueue()
+        # for corner in unvisited_corners:
+        #     manhattan_dis = util.manhattanDistance(pacmanPos, corner)
+        #     priDist.push((corner, manhattan_dis), manhattan_dis)
+        # nearest_corner, manhattan_dis = priDist.pop()
+        # distance += manhattan_dis
+        # pacmanPos = nearest_corner
+        # unvisited_corners.remove(nearest_corner)
+        nearest_corner = min(unvisited_corners, key = lambda corner: util.manhattanDistance(corner, pacmanPos)) 
+        distance += util.manhattanDistance(nearest_corner, pacmanPos)
         pacmanPos = nearest_corner
         unvisited_corners.remove(nearest_corner)
 
@@ -483,12 +487,20 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
     distance = 0
-
     for food in foodGrid.asList():
         maze_distance = mazeDistance(position, food, problem.startingGameState)
         distance = max(distance, maze_distance) # only need max because 
                                                 # expected that when eat furthest food, 
                                                 # nearer food will be ate
+    
+    # unvisited_food = foodGrid.asList()
+
+    # while len(unvisited_food) > 0:
+    #     nearest_food = min(unvisited_food, key = lambda food: util.manhattanDistance(food, position)) 
+    #     distance += util.manhattanDistance(nearest_food, position)
+    #     position = nearest_food
+    #     unvisited_food.remove(nearest_food)
+
     return distance
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -523,8 +535,7 @@ class ClosestDotSearchAgent(SearchAgent):
 
         # return search.depthFirstSearch(problem)
         # return search.breadthFirstSearch(problem)
-        return search.aStarSearch(problem)
-        # return search.aStarSearch(problem, foodHeuristic) # has a bug
+        # return search.aStarSearch(problem)
 
         util.raiseNotDefined()
 
@@ -582,3 +593,4 @@ def mazeDistance(point1, point2, gameState):
     assert not walls[x2][y2], 'point2 is a wall: ' + str(point2)
     prob = PositionSearchProblem(gameState, start=point1, goal=point2, warn=False, visualize=False)
     return len(search.bfs(prob))
+    # return len(search.astar(prob))

@@ -192,11 +192,11 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         if state not in visited:
             visited.append(state)
             for next_state, next_action, next_cost in problem.getSuccessors(state):
-                # if next_state in visited: continue
+                if next_state in visited: continue
                 new_cost = cost + next_cost
                 new_path = path + [next_action]
-                # pQueue.push([next_state, new_cost, new_path], new_cost + heuristic(next_state, problem))
-                pQueue.update([next_state, new_cost, new_path], new_cost + heuristic(next_state, problem))
+                pQueue.push([next_state, new_cost, new_path], new_cost + heuristic(next_state, problem))
+                # pQueue.update([next_state, new_cost, new_path], new_cost + heuristic(next_state, problem))
 
     util.raiseNotDefined()
 
