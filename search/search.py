@@ -94,15 +94,12 @@ def depthFirstSearch(problem):
     while not stack.isEmpty():
         node, cost, path = stack.pop()
         if problem.isGoalState(node): return path
-        if node not in visited_node: 
-            visited_node.append(node)
-            for successor, action, stepCost in problem.getSuccessors(node):
-                if successor in visited_node: continue
-                successor_cost = cost + stepCost
-                successor_path = path + [action]
-                stack.push((successor, successor_cost, successor_path))
-                # print(successor_cost)
-                # print(successor_path)
+        visited_node.append(node)
+        for successor, action, stepCost in problem.getSuccessors(node):
+            if successor in visited_node: continue
+            successor_cost = cost + stepCost
+            successor_path = path + [action]
+            stack.push((successor, successor_cost, successor_path))      
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
