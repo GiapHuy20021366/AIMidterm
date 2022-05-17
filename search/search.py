@@ -89,7 +89,8 @@ def depthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
 
     stack = util.Stack()
-    startNode = [problem.getStartState(), 0, []] #startState, cost, path
+    startNode = [problem.getStartState(), 0, []] # startState[pos, visitedCornersPos], cost, path
+                                                 # watch in searchAgents.py ☝️ class CornersProblems
 
     stack.push(startNode)
     visited = []
@@ -115,7 +116,8 @@ def breadthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
 
     queue = util.Queue()
-    startNode = [problem.getStartState(), 0, []] #startState, cost, path
+    startNode = [problem.getStartState(), 0, []] # startState[pos, visitedCornersPos], cost, path
+                                                 # watch in searchAgents.py ☝️ class CornersProblems
 
     queue.push(startNode)
     visited = []
@@ -141,7 +143,8 @@ def uniformCostSearch(problem):
     "*** YOUR CODE HERE ***"
 
     pQueue = util.PriorityQueue()
-    startNode = [problem.getStartState(), 0, []] #startState, cost, path
+    startNode = [problem.getStartState(), 0, []] # startState[pos, visitedCornersPos], cost, path
+                                                 # watch in searchAgents.py ☝️ class CornersProblems
 
     pQueue.push(startNode, startNode[1]) #priority: cost
     visited = []
@@ -174,7 +177,8 @@ def aStarSearch(problem, heuristic=nullHeuristic):
     "*** YOUR CODE HERE ***"
     
     pQueue = util.PriorityQueue()
-    startNode = [problem.getStartState(), 0, []] #startState, cost, path
+    startNode = [problem.getStartState(), 0, []] # startState[pos, visitedCornersPos], cost, path
+                                                 # watch in searchAgents.py ☝️ class CornersProblems
 
     pQueue.push(startNode, startNode[1]) #priority: cost
     visited = []
