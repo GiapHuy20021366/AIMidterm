@@ -80,18 +80,22 @@ class ReflexAgent(Agent):
         # # print(newGhostStates[0].getPosition())
         # # print(newScaredTimes)
 
-        #find nearest Food
-        foodList = newFood.asList()
-        nearestFood = float('inf')
-        for food in foodList:
-            nearestFood = min(nearestFood, manhattanDistance(newPos, food))
-
-        #find nearest ghost
-        nearestGhost = float('inf')
-        for ghost in newGhostStates:
-            if ghost.scaredTimer == 0: 
-                nearestGhost = min(nearestGhost, manhattanDistance(newPos, ghost.getPosition()))
-        return successorGameState.getScore() + 1 / (nearestFood + 1) - 1 / (nearestGhost + 1)
+        newFood = newFood.asList() #List position of foods
+        ghostPos = [G.getPosition() for G in newGhostStates] #List position of ghosts
+        nearest_ghost = min(ghostPos, key = lambda ghost_pos: util.manhattanDistance(ghost_pos, newPos))
+        nearest_ghost_mhtd = util.manhattanDistance(nearest_ghost, newPos)
+        scared = min(newScaredTimes) > 0  #ScaredTimes[...] for every ghost, maybe time
+        if not scared and (newPos in ghostPos): return -1.0
+        if scared:
+            if nearest_ghost_mhtd < min(newScaredTimes):
+                return 1 / nearest_ghost_mhtd + 1 
+        if newPos in currentGameState.getFood().asList():  return 1
+        
+        nearest_food = min(newFood, key = lambda food_pos: util.manhattanDistance(food_pos, newPos)) 
+        nearest_food_mhtd = util.manhattanDistance(nearest_food, newPos)
+        
+        return 1 / nearest_food_mhtd - 1.5 / nearest_ghost_mhtd 
+        
 
 
 
@@ -303,7 +307,30 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    pos = currentGameState.getPacmanPosition()
+    food = currentGameState.getFood()
+    ghostStates = currentGameState.getGhostStates()
+    scaredTimes = [ghostState.scaredTimer for ghostState in ghostStates]
+
+    nearestFood = float("inf")
+    if len(food.asList())>0:
+        for food in food.asList():
+            nearestFood = min(nearestFood, manhattanDistance(pos, food))
+        foodScore = 10/nearestFood
+    else:
+        foodScore = 0
+    
+    nearestGhost = float("inf")
+    for ghostState in ghostStates:
+        nearestGhost = min(nearestGhost, manhattanDistance(pos,ghostState.configuration.pos))
+    if nearestGhost != 0:
+        dangerScore = -10/nearestGhost
+    else:
+        dangerScore = 0
+    
+    totalScaredTimes = sum(scaredTimes)
+    
+    return currentGameState.getScore() + foodScore + dangerScore + totalScaredTimes
 
 # Abbreviation
 better = betterEvaluationFunction
