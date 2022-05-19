@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from math import dist
 import random
 from collections import Counter
 
@@ -177,12 +178,8 @@ class InferenceModule:
         "*** YOUR CODE HERE ***"
         if noisyDistance is None:
             return float(ghostPosition == jailPosition)
-
-        # noisyDistance != None
         if (ghostPosition == jailPosition):
             return 0.0
-        # if ghostPosition == jailPosition:
-        #     return float(noisyDistance is None)
         trueDistance = manhattanDistance(pacmanPosition, ghostPosition)
         return busters.getObservationProbability(noisyDistance, trueDistance)
 
@@ -292,13 +289,10 @@ class ExactInference(InferenceModule):
         position is known.
         """
         "*** YOUR CODE HERE ***"
-        pacmanPosition = gameState.getPacmanPosition()
-        jailPosition = self.getJailPosition()
-        beliefs = self.beliefs   # P(ghostPosition[t] | noisyDist[1:t])
-        for position in self.allPositions:
-            pr_noisy_given_real = self.getObservationProb(
-                observation, pacmanPosition, position, jailPosition)
-            beliefs[position] *= pr_noisy_given_real
+        for posi in self.allPositions:
+            self.beliefs[posi] *= self.getObservationProb(
+                observation, gameState.getPacmanPosition(), 
+                posi, self.getJailPosition())
         self.beliefs.normalize()
 
     def elapseTime(self, gameState):
@@ -311,21 +305,18 @@ class ExactInference(InferenceModule):
         current position is known.
         """
         "*** YOUR CODE HERE ***"
-        beliefs = self.beliefs
+        old_beliefs = self.beliefs
         new_beliefs = DiscreteDistribution()
-        pr_transition = {}
-
-        # Transition function:
-        # pr_transition[from][to] = P(nextPosition=to | currentPosition=from)
-        for position in self.allPositions:
-            pr_transition[position] = self.getPositionDistribution(gameState, position)
-
-        for position in self.allPositions:
-            new_beliefs[position] = sum(
-                pr_transition[prevPosition][position] * beliefs[prevPosition]
-                for prevPosition in beliefs
-            )
+        probFromOldToNew = {}
+        for oldPos in self.allPositions:
+            probFromOldToNew[oldPos] = self.getPositionDistribution(gameState, oldPos)
+        for newPos in self.allPositions:
+            sum = 0
+            for oldPos in old_beliefs:
+                sum += probFromOldToNew[oldPos][newPos] * old_beliefs[oldPos]
+            new_beliefs[newPos] = sum
         self.beliefs = new_beliefs
+        self.beliefs.normalize()
 
     def getBeliefDistribution(self):
         return self.beliefs
