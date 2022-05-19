@@ -17,10 +17,6 @@ import inference
 import util
 from keyboardAgents import KeyboardAgent
 
-from my_utils import (
-    dict_argmax,
-    getIndexOfMin
-)
 from game import Actions
 
 class NullGraphics:

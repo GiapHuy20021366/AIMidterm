@@ -12,14 +12,13 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
-from math import dist
 import random
 from collections import Counter
 
 import busters
 import game
 
-from util import manhattanDistance, raiseNotDefined
+from util import manhattanDistance
 
 from pacman import GameState
 
