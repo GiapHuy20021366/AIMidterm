@@ -28,9 +28,6 @@ but when you're ready to test your own agent, replace it with MyAgent
 def createAgents(num_pacmen, agent='MyAgent'):
     return [eval(agent)(index=i) for i in range(num_pacmen)]
 
-paths = [None for i in range(10)]
-targets = [None for i in range(10)]
-force_stop = [False for i in range(10)]
 class MyAgent(Agent):
     """
     Implementation of your agent.
@@ -43,77 +40,21 @@ class MyAgent(Agent):
 
         "*** YOUR CODE HERE ***"
         global targets
-        global paths
-        global force_stop
-        startPosition = state.getPacmanPosition(self.index)
-        food = state.getFood()
-        walls = state.getWalls()  
-        problem = AnyFoodSearchProblem(state, self.index)
+        global numFood
+        if targets is None: targets = [None for _ in range(state.getNumPacmanAgents())]
+        if numFood is None: numFood = state.getNumFood() 
+        if len(self.path) == 0:
+            if numFood == 0:
+                return Directions.STOP
+            else:
+                problem = AnyFoodSearchProblem(state, self.index)
+                self.path = search.breadthFirstSearch(problem)
+                numFood -= 1
+        ### Action
+        next_action = self.path[0]
+        del self.path[0]
+        return next_action
 
-        if force_stop[self.index]:
-            return Directions.STOP
-
-        target = targets[self.index]
-        if target is not None and not food[target[0]][target[1]]: 
-            targets[self.index] = None
-            paths[self.index] = None
-            # targets = [None for i in range(10)]
-            # paths = [None for i in range(10)]
-        
-        for target in targets:
-            if target is not None:
-                food[target[0]][target[1]] = False
-        problem.food = food
-        
-        # if targets[self.index] is None:
-        #     for agentIndex,targetIndex in enumerate(targets):
-        #         if targetIndex is not None:
-        #             mht = util.manhattanDistance(targetIndex, startPosition)
-        #             if mht <= len(paths[agentIndex]) and mht < 2:
-        #                 # Let many pacman eat a target together
-        #                 pos_problem = PositionSearchProblem(state, agentIndex=self.index, goal=targetIndex, start = startPosition)
-        #                 path, target = search.breadthFirstSearch(pos_problem)
-        #                 targets[self.index] = target
-        #                 paths[self.index] = path
-        #                 break
-                    
-        if targets[self.index] is None:
-            while len(food.asList()) > 0:
-                path, target = search.breadthFirstSearch(problem)
-                if target in targets:
-                    food[target[0]][target[1]] = False
-                    problem.food = food
-                else:
-                    targets[self.index] = target
-                    paths[self.index] = path
-                    break
-        
-        # When number of dot < number of agent: Devide food again
-        if targets[self.index] is None:
-            for agentIndex,targetIndex in enumerate(targets):
-                if targetIndex is not None:
-                    mht = util.manhattanDistance(targetIndex, startPosition)
-                    if mht < len(paths[agentIndex]) and mht < 5:
-                        # Let many pacman eat a target together
-                        pos_problem = PositionSearchProblem(state, agentIndex=self.index, goal=targetIndex, start = startPosition)
-                        path, target = search.breadthFirstSearch(pos_problem)
-                        if len(path) < len(paths[agentIndex]):
-                            targets[self.index] = target
-                            paths[self.index] = path
-                            targets[agentIndex] = None
-                            force_stop[agentIndex] = True
-                            break
-                        break
-                        
-                    
-                   
-        if targets[self.index] is not None:
-            action = paths[self.index][0]
-            del paths[self.index][0]
-            return action
-        
-        if targets[self.index] is None:
-            return Directions.STOP
     
     def initialize(self):
         """
@@ -123,7 +64,11 @@ class MyAgent(Agent):
         """
 
         "*** YOUR CODE HERE"
-        # raise NotImplementedError()
+        global targets
+        targets = None
+        global numFood
+        numFood = None
+        self.path = []
 
 """
 Put any other SearchProblems or search methods below. You may also import classes/methods in
@@ -145,7 +90,6 @@ class ClosestDotAgent(Agent):
 
 
         "*** YOUR CODE HERE ***"
-        # print(self.index)
         return search.aStarSearch(problem)
         util.raiseNotDefined()
 
@@ -189,6 +133,10 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"   
-        return self.food[x][y]
-        util.raiseNotDefined()
+        global targets
+        if (x,y) not in targets and self.food[x][y]:
+            targets[self.agentIndex] = (x,y)
+            return True
+        return False
+        
 

@@ -111,7 +111,7 @@ def breadthFirstSearch(problem):
     stack.push(start_node)
     while not stack.isEmpty():
         node, cost, path = stack.pop()
-        if problem.isGoalState(node): return path, node
+        if problem.isGoalState(node): return path
         if node not in visited_node: 
             visited_node.append(node)
             for successor,action, stepCost in problem.getSuccessors(node):
