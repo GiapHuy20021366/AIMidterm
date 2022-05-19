@@ -370,18 +370,22 @@ class ParticleFilter(InferenceModule):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        pacmanPosition = gameState.getPacmanPosition()
-        jailPosition = self.getJailPosition()
-        beliefs = self.getBeliefDistribution()
-        for particle in beliefs:
-            beliefs[particle] *= self.getObservationProb(observation,
-                                                         pacmanPosition,
-                                                         particle, jailPosition)
-        if beliefs.total() == 0:
+        currentBeliefs = self.getBeliefDistribution()
+        # update currentBeliefs
+        for particle in currentBeliefs.keys():
+            currentBeliefs[particle] *= self.getObservationProb(observation,
+                                                        gameState.getPacmanPosition(),
+                                                        particle,
+                                                        self.getJailPosition())
+        currentBeliefs.normalize()
+        # special case
+        if currentBeliefs.total() == 0:
             self.initializeUniformly(gameState)
-        else:
-            self.particles = random.choices(list(beliefs), k=self.numParticles,
-                                            weights=list(beliefs.values()))
+            return
+        # update particles with new beliefs
+        self.particles = random.choices(list(currentBeliefs.keys()),
+                                        weights = list(currentBeliefs.values()),
+                                        k = self.numParticles)
 
     def elapseTime(self, gameState):
         """
@@ -406,9 +410,9 @@ class ParticleFilter(InferenceModule):
         This function should return a normalized distribution.
         """
         "*** YOUR CODE HERE ***"
-        distribution = DiscreteDistribution(Counter(self.particles))
-        distribution.normalize()
-        return distribution
+        beliefDistribution = DiscreteDistribution(Counter(self.particles))
+        beliefDistribution.normalize()
+        return beliefDistribution
 
 
 class JointParticleFilter(ParticleFilter):
