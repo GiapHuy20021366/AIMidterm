@@ -11,11 +11,12 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+from pickle import STOP
 from game import Agent
+from game import Directions
 from searchProblems import PositionSearchProblem
 
 import util
-import time
 import search
 
 """
@@ -23,22 +24,66 @@ IMPORTANT
 `agent` defines which agent you will use. By default, it is set to ClosestDotAgent,
 but when you're ready to test your own agent, replace it with MyAgent
 """
-def createAgents(num_pacmen, agent='ClosestDotAgent'):
+def createAgents(num_pacmen, agent='MyAgent'): #ClosestDotAgent #MyAgent
     return [eval(agent)(index=i) for i in range(num_pacmen)]
 
 class MyAgent(Agent):
     """
     Implementation of your agent.
     """
-
     def getAction(self, state):
         """
         Returns the next action the agent will take
         """
 
         "*** YOUR CODE HERE ***"
+        startPosition = state.getPacmanPosition(self.index)
+        self.food = state.getFood()
+        self.walls = state.getWalls()
+        problem = AnyFoodSearchProblem(state, self.index)
 
-        raise NotImplementedError()
+        numPacmen = state.getNumPacmanAgents()
+        index = self.index    
+        # print("agent index ", index, "/", numPacmen, ": ")
+        # print("startPOS: ", startPosition)  
+
+        global targets, numFood
+        if len(targets) == 0: targets = [(-1,-1) for i in range(0, numPacmen)]
+        if numFood is None: numFood = state.getNumFood()
+        # print(targets)
+        # print(paths)
+
+        # for agentIndex, target in enumerate(targets):
+        #     if agentIndex != index and target != (-1,-1):
+        #         self.walls[target[0]][target[1]] = True
+        #         self.food[target[0]][target[1]] = False
+        # problem.food = self.food
+        # problem.walls = self.walls
+
+        if numFood == 0: # no un-targeted food
+            if len(self.path) == 0: return Directions.STOP
+
+        if targets[index] == (-1,-1) \
+            or self.food[targets[index][0]][targets[index][1]] == False \
+            or len(self.path) < 1:          
+            if numFood > 0:
+                targets[index], self.path = search.breadthFirstSearch(problem)
+                numFood -= 1
+                # print(targets[index])
+                # print(numFood)
+            
+                # for i in range(0, numPacmen):
+                #     # print('/t', i, "/", numPacmen)
+                #     if i != index: 
+                #         # print("/t", i)
+                #         state.getPacmanState.getFood[targets[index][0]][targets[index][1]] = False      
+                #         state.getPacmanState.getWalls[targets[index][0]][targets[index][1]] = True     
+    
+        # print(targets)
+        action = self.path[0]
+        del self.path[0]
+        return action
+        # raise NotImplementedError()
 
     def initialize(self):
         """
@@ -48,8 +93,15 @@ class MyAgent(Agent):
         """
 
         "*** YOUR CODE HERE"
+        global targets, numFood # numFood: # of food not targeted
+        targets = [] # food is being targeted by Pac-men/All-agents
+        numFood = None
 
-        raise NotImplementedError()
+        self.path = []
+        self.food = []
+        self.walls = []
+
+        # raise NotImplementedError()
 
 """
 Put any other SearchProblems or search methods below. You may also import classes/methods in
@@ -70,11 +122,10 @@ class ClosestDotAgent(Agent):
         problem = AnyFoodSearchProblem(gameState, self.index)
 
 
-        "*** YOUR CODE HERE ***"
-
-        return search.breadthFirstSearch(problem)
+        "*** YOUR CODE HERE ***"        
+        # return search.aStarSearch(problem)[1]
+        return search.breadthFirstSearch(problem)[1]  # longest alive
         # return search.uniformCostSearch(problem)
-        # return search.aStarSearch(problem)
         # return search.depthFirstSearch(problem)   # fastest death
 
         util.raiseNotDefined()
@@ -117,7 +168,13 @@ class AnyFoodSearchProblem(PositionSearchProblem):
 
         "*** YOUR CODE HERE ***"
 
-        return (x,y) in self.food.asList()
+        global targets
 
+        if self.food[x][y] and (x,y) not in targets:
+            # targets[self.agentIndex] = x,y
+            # print(targets)
+            return True
+
+        return False
         util.raiseNotDefined()
 

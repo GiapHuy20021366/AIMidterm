@@ -126,7 +126,7 @@ def breadthFirstSearch(problem):
         [state, cost, path] = queue.pop()
 
         if problem.isGoalState(state):
-            return path
+            return state, path
 
         if state not in visited:
             visited.append(state)
@@ -136,7 +136,7 @@ def breadthFirstSearch(problem):
                 new_path = path + [next_action]
                 queue.push([next_state, new_cost, new_path])
 
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
@@ -187,7 +187,7 @@ def aStarSearch(problem, heuristic=nullHeuristic):
         [state, cost, path] = pQueue.pop()
 
         if problem.isGoalState(state):
-            return path
+            return state, path
 
         if state not in visited:
             visited.append(state)
