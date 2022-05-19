@@ -439,11 +439,8 @@ class JointParticleFilter(ParticleFilter):
         for _ in range(self.numGhosts):
             positionsForEachGhost.append(
                 evenlyDistributedParticles(self.numParticles, self.legalPositions))
-        # for positions in positionsForEachGhost[1:]:
-        #     random.shuffle(positions)
         for index in range(1, len(positionsForEachGhost)):
             random.shuffle(positionsForEachGhost[index])
-
         self.particles = list(zip(*positionsForEachGhost))
 
     def addGhostAgent(self, agent):
