@@ -159,18 +159,34 @@ class GreedyBustersAgent(BustersAgent):
             [beliefs for i, beliefs in enumerate(self.ghostBeliefs)
              if livingGhosts[i + 1]]
         "*** YOUR CODE HERE ***"
-        dist = self.distancer.getDistance
-        ghostPositions = [distribution.argMax()
-                          for distribution in livingGhostPositionDistributions]
-
-        def dist_from_pacman(ghostPosition):
-            return dist(pacmanPosition, ghostPosition)
-
-        closestGhostPosition = min(ghostPositions, key=dist_from_pacman)
-
-        def distance_from_closest_ghost_after_action(action):
+        # Tim position co xac suat lon nhat
+        ghostPositions = []
+        for discreteDistribution in livingGhostPositionDistributions:
+            max = 0
+            keyMax = None
+            for key in discreteDistribution.keys():
+                if discreteDistribution[key] > max:
+                    max = discreteDistribution[key]
+                    keyMax = key
+            ghostPositions.append(keyMax)
+        
+        # Tim nearest Ghost
+        nearestGhostPosi = None
+        for ghostPosition in ghostPositions:
+            minDist = float("inf")
+            
+            distFromGhostToPacman = self.distancer.getDistance(pacmanPosition, ghostPosition)
+            if (distFromGhostToPacman < minDist):
+                minDist = distFromGhostToPacman
+                nearestGhostPosi = ghostPosition
+        
+        # Tim hanh dong ma giup Pacman den gan nearestGhost nhat
+        minDistToNearestGhost = float("inf")
+        greedyAction = None
+        for action in legalActions:
             newPacmanPosition = Actions.getSuccessor(pacmanPosition, action)
-            return dist(newPacmanPosition, closestGhostPosition)
-
-        greedyAction = min(legalActions, key=distance_from_closest_ghost_after_action)
+            newDistToNearestGhost = self.distancer.getDistance(newPacmanPosition, nearestGhostPosi)
+            if (newDistToNearestGhost < minDistToNearestGhost):
+                minDistToNearestGhost = newDistToNearestGhost
+                greedyAction = action
         return greedyAction
