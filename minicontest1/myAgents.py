@@ -30,7 +30,7 @@ def createAgents(num_pacmen, agent='MyAgent'):
 
 paths = [None for i in range(10)]
 targets = [None for i in range(10)]
-
+force_stop = [False for i in range(10)]
 class MyAgent(Agent):
     """
     Implementation of your agent.
@@ -44,19 +44,39 @@ class MyAgent(Agent):
         "*** YOUR CODE HERE ***"
         global targets
         global paths
+        global force_stop
         startPosition = state.getPacmanPosition(self.index)
         food = state.getFood()
         walls = state.getWalls()  
         problem = AnyFoodSearchProblem(state, self.index)
 
+        if force_stop[self.index]:
+            return Directions.STOP
+
         target = targets[self.index]
         if target is not None and not food[target[0]][target[1]]: 
-            # targets[self.index] = None
-            # paths[self.index] = None
-            targets = [None for i in range(10)]
-            paths = [None for i in range(10)]
+            targets[self.index] = None
+            paths[self.index] = None
+            # targets = [None for i in range(10)]
+            # paths = [None for i in range(10)]
         
+        for target in targets:
+            if target is not None:
+                food[target[0]][target[1]] = False
+        problem.food = food
         
+        # if targets[self.index] is None:
+        #     for agentIndex,targetIndex in enumerate(targets):
+        #         if targetIndex is not None:
+        #             mht = util.manhattanDistance(targetIndex, startPosition)
+        #             if mht <= len(paths[agentIndex]) and mht < 2:
+        #                 # Let many pacman eat a target together
+        #                 pos_problem = PositionSearchProblem(state, agentIndex=self.index, goal=targetIndex, start = startPosition)
+        #                 path, target = search.breadthFirstSearch(pos_problem)
+        #                 targets[self.index] = target
+        #                 paths[self.index] = path
+        #                 break
+                    
         if targets[self.index] is None:
             while len(food.asList()) > 0:
                 path, target = search.breadthFirstSearch(problem)
@@ -67,7 +87,26 @@ class MyAgent(Agent):
                     targets[self.index] = target
                     paths[self.index] = path
                     break
+        
+        # When number of dot < number of agent: Devide food again
+        if targets[self.index] is None:
+            for agentIndex,targetIndex in enumerate(targets):
+                if targetIndex is not None:
+                    mht = util.manhattanDistance(targetIndex, startPosition)
+                    if mht < len(paths[agentIndex]) and mht < 5:
+                        # Let many pacman eat a target together
+                        pos_problem = PositionSearchProblem(state, agentIndex=self.index, goal=targetIndex, start = startPosition)
+                        path, target = search.breadthFirstSearch(pos_problem)
+                        if len(path) < len(paths[agentIndex]):
+                            targets[self.index] = target
+                            paths[self.index] = path
+                            targets[agentIndex] = None
+                            force_stop[agentIndex] = True
+                            break
+                        break
+                        
                     
+                   
         if targets[self.index] is not None:
             action = paths[self.index][0]
             del paths[self.index][0]
