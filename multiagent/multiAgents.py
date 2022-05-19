@@ -74,11 +74,12 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        # print(newPos)
-        # print(newFood.asList())
-        # print(newGhostStates[0], '|||',  newGhostStates[1])
-        # print(newGhostStates[0].getPosition())
-        # print(newScaredTimes)
+        # # print(newPos)
+        # # print(newFood.asList())
+        # # print(newGhostStates[0], '|||',  newGhostStates[1])
+        # # print(newGhostStates[0].getPosition())
+        # # print(newScaredTimes)
+
         newFood = newFood.asList() #List position of foods
         ghostPos = [G.getPosition() for G in newGhostStates] #List position of ghosts
         nearest_ghost = min(ghostPos, key = lambda ghost_pos: util.manhattanDistance(ghost_pos, newPos))
@@ -95,7 +96,8 @@ class ReflexAgent(Agent):
         
         return 1 / nearest_food_mhtd - 1.5 / nearest_ghost_mhtd 
         
-        return successorGameState.getScore()
+
+
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -156,7 +158,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
+
         def minimax(agentIndex, depth, gameState, getBestAction = False):
+    
             # stop neu win or lose or depth is max
             if gameState.isWin() or gameState.isLose() or depth == self.depth:
                 return self.evaluationFunction(gameState)
@@ -179,6 +183,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return minimax(0, 0, gameState, getBestAction=True)
         
 
+        
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 3)
