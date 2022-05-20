@@ -307,6 +307,7 @@ def betterEvaluationFunction(currentGameState):
     totalScaredTimes = sum(scaredTimes)
     
     return currentGameState.getScore() + foodScore + dangerScore + totalScaredTimes
+    util.raiseNotDefined()
 
 # Abbreviation
 better = betterEvaluationFunction
