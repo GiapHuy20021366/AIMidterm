@@ -369,21 +369,25 @@ class ParticleFilter(InferenceModule):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        currentBeliefs = self.getBeliefDistribution()
-        # update currentBeliefs
-        for particle in currentBeliefs.keys():
-            currentBeliefs[particle] *= self.getObservationProb(observation,
+        # particles -> beliefs
+        beliefs = self.getBeliefDistribution()
+
+        # update beliefs
+        for posi in beliefs.keys():
+            beliefs[posi] *= self.getObservationProb(observation,
                                                         gameState.getPacmanPosition(),
-                                                        particle,
+                                                        posi,
                                                         self.getJailPosition())
-        currentBeliefs.normalize()
-        # special case
-        if currentBeliefs.total() == 0:
+        beliefs.normalize()
+
+        # all particles receive zero weight -> reinitialize
+        if beliefs.total() == 0:
             self.initializeUniformly(gameState)
             return
+
         # update particles with new beliefs
-        self.particles = random.choices(list(currentBeliefs.keys()),
-                                        weights = list(currentBeliefs.values()),
+        self.particles = random.choices(list(beliefs.keys()),
+                                        weights = list(beliefs.values()),
                                         k = self.numParticles)
 
     def elapseTime(self, gameState):
