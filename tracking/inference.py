@@ -438,13 +438,13 @@ class JointParticleFilter(ParticleFilter):
         uniform prior.
         """
         "*** YOUR CODE HERE ***"
-        positionsForEachGhost = []
+        listOfParticles = []    # each element of list is Paticles of 1 ghost
         for _ in range(self.numGhosts):
-            positionsForEachGhost.append(
+            listOfParticles.append(
                 evenlyDistributedParticles(self.numParticles, self.legalPositions))
-        for index in range(1, len(positionsForEachGhost)):
-            random.shuffle(positionsForEachGhost[index])
-        self.particles = list(zip(*positionsForEachGhost))
+        for index in range(1, len(listOfParticles)):
+            random.shuffle(listOfParticles[index])
+        self.particles = list(zip(*listOfParticles))
 
     def addGhostAgent(self, agent):
         """
@@ -477,21 +477,22 @@ class JointParticleFilter(ParticleFilter):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        currentBeliefs = self.getBeliefDistribution()
-        # update currentBeliefs
-        for particle in currentBeliefs.keys():
+        # particles -> beliefs
+        beliefs = self.getBeliefDistribution()
+        # update beliefs
+        for particle in beliefs.keys():
             for i in range(self.numGhosts):
-                currentBeliefs[particle] *= self.getObservationProb(observation[i],
+                beliefs[particle] *= self.getObservationProb(observation[i],
                                                              gameState.getPacmanPosition(),
                                                              particle[i],
                                                              self.getJailPosition(i))
-        # special case
-        if currentBeliefs.total() == 0:
+        # all particles receive zero weight -> reinitialize
+        if beliefs.total() == 0:
             self.initializeUniformly(gameState)
             return
         # update particles with new beliefs
-        self.particles = random.choices(list(currentBeliefs.keys()), 
-                                        weights = list(currentBeliefs.values()),
+        self.particles = random.choices(list(beliefs.keys()), 
+                                        weights = list(beliefs.values()),
                                         k = self.numParticles)
 
     def elapseTime(self, gameState):
